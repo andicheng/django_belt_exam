@@ -1,0 +1,56 @@
+<html>
+<head>
+   <meta charset = "utf-8">
+	<title> Login Registration Django </title>
+
+   <style> div{display: inline_block; width: 300px;}</style>
+</head>
+
+<body>
+   <div id="register">
+      {% if messages %}
+      <ul class="messages">
+          {% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+          {% endfor %}
+      </ul>
+      {% endif %}
+      <fieldset>
+         <legend>Registration</legend>
+         <form action="/register" method="POST">
+            {% csrf_token %}
+            <p>First Name:
+               <input type="text" name="first_name" placeholder="First Name">
+            </p>
+            <p>Last Name:
+               <input type="text" name="last_name" placeholder="Last Name">
+            </p>
+            <p>Email Address:
+               <input type="text" name="email" placeholder="Email Address">
+            </p>
+            <p>Password:
+               <input type="password" name="password" placeholder="Password">
+            </p>
+            <p>Confirm Password:
+               <input type="password" name="confword" placeholder="Password">
+            </p>
+            <input type="submit" value="Submit">
+         </form>
+      </fieldset>
+   </div>
+   <div id="login">
+      <fieldset>
+         <legend>Login</legend>
+         <form action="/login" method="POST">
+            {% csrf_token %}
+            <p>Email Address:
+               <input type="text" name="email" placeholder="Email Address">
+            </p>
+            <p>Password:
+               <input type="password" name="password" placeholder="Password">
+            </p>
+            <input type="submit" value = "Submit">
+         </form>
+      </fieldset>
+   </div>
+</body>

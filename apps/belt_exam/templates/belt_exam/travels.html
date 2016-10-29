@@ -45,7 +45,7 @@
          </tr>
          {% for trip in other_trips %}
          <tr>
-            <td>{{trip.planner_fname}} {{trip.planner_lname}}</td>
+            <td>{{trip.planner.first_name}} {{trip.planner.last_name}}</td>
             <td><a href="/destination/{{trip.id}}">{{trip.destination}}</td>
             <td>{{trip.travel_start_date}}</td>
             <td>{{trip.travel_end_date}}</td>

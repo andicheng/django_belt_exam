@@ -4,7 +4,7 @@ import string
 import datetime
 import bcrypt
 import re
-from .models import User, Trip
+from .models import User, Trip, Membership
 from django.contrib import messages
 
 def index(request):
@@ -57,8 +57,8 @@ def login(request):
 def travels(request):
     users = User.objects.all()
     user = User.objects.get(id=request.session['logged_user'])
-    my_trips = Trip.objects.filter(users=user.id)
-    other_trips = Trip.objects.exclude(users=user.id)
+    my_trips = Trip.objects.filter(members=user.id)
+    other_trips = Trip.objects.exclude(members=user.id)
     trips = Trip.objects.all()
     context = {
         'my_trips' : my_trips,
@@ -72,32 +72,37 @@ def travels(request):
 def join(request, id):
     user = User.objects.get(id=request.session['logged_user'])
     trip = Trip.objects.get(id=id)
-    trip.users.add(user)
+    Membership.objects.create(user=user, trip=trip)
     return redirect('/travels')
 
 def add_plan(request):
     return render(request, 'belt_exam/add.html')
 
 def add(request):
-    user = User.objects.get(id=request.session['logged_user'])
-    planner_fname=user.first_name
-    planner_lname=user.last_name
-    destination = request.POST['destination']
-    description = request.POST['description']
-    travel_start_date = request.POST['travel_start_date']
-    travel_end_date = request.POST['travel_end_date']
-    trip = Trip.objects.create(planner_fname=planner_fname, planner_lname=planner_lname, destination=destination, description=description, travel_start_date=travel_start_date, travel_end_date=travel_end_date)
-    trip.users.add(user)
-    return redirect('/travels')
+    if request.method=="POST":
+        user = User.objects.get(id=request.session['logged_user'])
+        destination = request.POST['destination']
+        description = request.POST['description']
+        travel_start_date = request.POST['travel_start_date']
+        travel_end_date = request.POST['travel_end_date']
+        errors = Trip.objects.validate(travel_start_date, travel_end_date)
+        if len(errors) >0:
+            for error in errors:
+                messages.add_message(request, messages.INFO, error)
+            return redirect ('/add_plan')
+        else:
+            trip = Trip.objects.create(planner=user, destination=destination, description=description, travel_start_date=travel_start_date, travel_end_date=travel_end_date)
+            Membership.objects.create(user=user, trip = trip)
+            return redirect('/travels')
+    else:
+        return redirect('/travels')
 
 def destination(request, id):
     trip = Trip.objects.get(id=id)
-    users = User.objects.all()
-    joined = User.objects.filter(trip=trip.id).exclude(first_name=trip.planner_fname)
+    users = User.objects.filter(membership__trip=trip).exclude(id=trip.planner.id)
     context = {
         'trip' : trip,
         'users' : users,
-        'joined' : joined,
     }
     return render(request, 'belt_exam/destination.html', context)
 

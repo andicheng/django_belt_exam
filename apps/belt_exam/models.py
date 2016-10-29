@@ -1,6 +1,9 @@
 from __future__ import unicode_literals
 import bcrypt
 import re
+import datetime
+import dateutil
+from dateutil import parser
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
 from django.db import models
 
@@ -60,6 +63,17 @@ class UserManager(models.Manager):
                 return user
         return None
 
+class TripManager(models.Manager):
+
+    def validate(self, travel_start_date, travel_end_date):
+        errors=[]
+        if travel_start_date > travel_end_date:
+            errors.append("Travel-to date must be after Travel-start date")
+        travel_start_date = dateutil.parser.parse(travel_start_date)
+        if travel_start_date < datetime.datetime.today():
+            errors.append("Please enter a travel date in the future")
+        return errors
+
 class User(models.Model):
     first_name = models.CharField(max_length=45)
     last_name = models.CharField(max_length=45)
@@ -70,12 +84,17 @@ class User(models.Model):
     objects = UserManager()
 
 class Trip(models.Model):
-    users = models.ManyToManyField(User)
-    planner_fname = models.CharField(max_length=45)
-    planner_lname = models.CharField(max_length=45)
+    members = models.ManyToManyField(User, through='Membership', related_name='members')
+    planner = models.ForeignKey(User, related_name='planner',on_delete=models.CASCADE)
     destination = models.CharField(max_length=45)
     description = models.CharField(max_length=255)
     travel_start_date = models.DateField(auto_now=False)
     travel_end_date = models.DateField(auto_now=False)
     date_added = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now_add=True)
+    objects = TripManager()
+
+class Membership(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE)
+    date_joined = models.DateField(auto_now=True)

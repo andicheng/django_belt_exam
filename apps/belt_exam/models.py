@@ -2,8 +2,6 @@ from __future__ import unicode_literals
 import bcrypt
 import re
 import datetime
-import dateutil
-from dateutil import parser
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
 from django.db import models
 

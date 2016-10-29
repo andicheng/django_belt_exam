@@ -1,0 +1,53 @@
+<html>
+<head>
+   <meta charset = "utf-8">
+	<title> Quotes </title>
+   {% load staticfiles %}
+   <!-- <link rel="stylesheet" href="{% static '/dope_vinyl/css/adminlogin.css' %}" media="screen" title="no title"> -->
+   <link rel="stylesheet" href="{% static 'belt_exam/css/quotes.css' %}"media="screen" title="no title"  charset="utf-8">
+</head>
+
+<body>
+   <div id="container">
+      <div id="header">
+         <h3>Welcome, <span> {{user.alias}}! </span></h3>
+         <p id='logout'><a href="/logout">Logout</a></p>
+      </div>
+      {% if messages %}
+      <ul class="messages">
+          {% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+          {% endfor %}
+      </ul>
+      {% endif %}
+      <div id="left_block">
+         <h3>Quotable Quotes</h3>
+         {% for quote in other_quotes %}
+         <div class="quotes">
+            <p>{{quote.author}}: {{quote.quote}}</p>
+            <p class="poster">Posted by <a href="/users/{{quote.poster.id}}">{{quote.poster.alias}}<p>
+            <a class="button" href="/add_favorite/{{quote.id}}">Add to My List</a>
+         </div>
+         {% endfor %}
+      </div>
+      <div id="favorites">
+         <h3>Your Favorites</h3>
+         {% for quote in my_favorites %}
+         <div class="quotes">
+            <p>{{quote.author}}: {{quote.quote}}</p>
+            <p class="poster">Posted by <a href="/users/{{quote.poster.id}}">{{quote.poster.alias}}<p>
+            <a class="button" href="/remove/{{quote.id}}">Remove From My List</a>
+         </div>
+         {% endfor %}
+      </div>
+      <div id="add_quote">
+         <h4>Contribute a Quote:</h4>
+         <form action="/add_quote" method="POST">
+            {% csrf_token %}
+         <p>Quoted By: <input type="text" name="author"></p>
+         <p>Message: <input type="text" name="quote"></p>
+         <input type='submit' value="Submit">
+      </div>
+   </div>
+</body>
+</html>

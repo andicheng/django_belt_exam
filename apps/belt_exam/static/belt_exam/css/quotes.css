@@ -1,0 +1,57 @@
+#container{
+   width: 1000px;
+}
+#header{
+   width: 100%;
+   padding: 20px;
+}
+   #header h3{
+      display: inline-block;
+      vertical-align: top;
+      margin-right: 800px;
+   }
+   #header p{
+      display: inline-block;
+      vertical-align: top;
+   }
+#left_block{
+   width: 37%;
+   height: 700px;
+   overflow: scroll;
+   border-style: solid;
+   display: inline-block;
+   vertical-align: top;
+   margin-left: 5%;
+   padding: 10px;
+}
+#favorites{
+   width: 37%;
+   height: 650px;
+   overflow: scroll;
+   border-style: solid;
+   display: inline-block;
+   vertical-align: top;
+   margin-left: 10%;
+   padding: 10px;
+}
+#add_quote{
+   margin-left: 60%;
+}
+.quotes{
+   border: 1px solid black;
+   padding: 5px;
+   margin-bottom: 10px;
+}
+.poster{
+   display: inline-block;
+   width: 120px;
+   margin-bottom: 0px;
+}
+.button{
+   display: inline-block;
+   width: 150px;
+   border-style: solid;
+   text-decoration: none;
+   text-align: center;
+   margin-top: 0px;
+}

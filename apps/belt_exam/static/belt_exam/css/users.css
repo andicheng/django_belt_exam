@@ -1,0 +1,14 @@
+#author{
+   color: red;
+}
+#dashboard{
+   margin-left: 800px;
+   margin-right: 10px;
+}
+#logout{
+   margin-left: 10px;
+}
+#container{
+   width: 1000px;
+   padding: 20px;
+}

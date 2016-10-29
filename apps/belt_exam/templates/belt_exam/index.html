@@ -16,26 +16,29 @@
       </ul>
       {% endif %}
       <fieldset>
-         <h2>Hi There!!!!</h2>
          <legend>Registration</legend>
          <form action="/register" method="POST">
             {% csrf_token %}
-            <p>First Name:
-               <input type="text" name="first_name" placeholder="First Name">
+            <p>Name:
+               <input type="text" name="name">
             </p>
-            <p>Last Name:
-               <input type="text" name="last_name" placeholder="Last Name">
+            <p>Alias:
+               <input type="text" name="alias" >
             </p>
-            <p>Email Address:
-               <input type="text" name="email" placeholder="Email Address">
+            <p>Email:
+               <input type="text" name="email">
             </p>
             <p>Password:
-               <input type="password" name="password" placeholder="Password">
+               <input type="password" name="password">
             </p>
-            <p>Confirm Password:
-               <input type="password" name="confword" placeholder="Password">
+            <p>*Password should be at least 8 characters</p>
+            <p>Confirm PW:
+               <input type="password" name="confword">
             </p>
-            <input type="submit" value="Submit">
+            <p>Date of Birth:
+               <input type="date" name="date_of_birth">
+            </p>
+            <input type="submit" value="Register">
          </form>
       </fieldset>
    </div>
@@ -44,13 +47,13 @@
          <legend>Login</legend>
          <form action="/login" method="POST">
             {% csrf_token %}
-            <p>Email Address:
-               <input type="text" name="email" placeholder="Email Address">
+            <p>Email:
+               <input type="text" name="email">
             </p>
             <p>Password:
-               <input type="password" name="password" placeholder="Password">
+               <input type="password" name="password">
             </p>
-            <input type="submit" value = "Submit">
+            <input type="submit" value = "Login">
          </form>
       </fieldset>
    </div>

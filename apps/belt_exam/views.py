@@ -4,7 +4,7 @@ import string
 import datetime
 import bcrypt
 import re
-from .models import User, Trip, Membership
+from .models import User, Quote, Favorite
 from django.contrib import messages
 
 def index(request):
@@ -12,21 +12,23 @@ def index(request):
 
 def register(request):
     if request.method == "POST":
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
+        name = request.POST['name']
+        alias = request.POST['alias']
         email = request.POST['email']
         password = request.POST['password']
         confword = request.POST['confword']
-        errors = User.objects.validate(first_name, last_name, email, password, confword)
+        date_of_birth = request.POST['date_of_birth']
+        print date_of_birth
+        errors = User.objects.validate(name, alias, email, date_of_birth, password, confword)
         if len(errors)>0:
             for error in errors:
                 messages.add_message(request, messages.INFO, error)
             return redirect('/')
         else:
-            user = User.objects.register(first_name, last_name, email, password)
+            user = User.objects.register(name, alias, email, date_of_birth, password)
             request.session['logged_user'] = user.id
             messages.add_message(request, messages.INFO, "Successfully registered")
-            return redirect('/travels')
+            return redirect('/quotes')
     else:
         return redirect('/')
 
@@ -47,68 +49,64 @@ def login(request):
                 test = request.session['logged_user']
                 print test
                 messages.add_message(request, messages.INFO, "Successfully logged-in")
-                return redirect('/travels')
+                return redirect('/quotes')
             else:
                 messages.add_message(request, messages.INFO, "Invalid Login Credentials")
                 return redirect('/')
     else:
         return redirect('/')
 
-def travels(request):
-    users = User.objects.all()
+def quotes(request):
+    # quotes = Quote.objects.all()
     user = User.objects.get(id=request.session['logged_user'])
-    my_trips = Trip.objects.filter(members=user.id)
-    other_trips = Trip.objects.exclude(members=user.id)
-    trips = Trip.objects.all()
+    my_favorites = Quote.objects.filter(fans = user.id).order_by("-date_added")
+    other_quotes = Quote.objects.exclude(fans = user.id).order_by("-date_added")
+    # users = User.objects.all()
     context = {
-        'my_trips' : my_trips,
         'user' : user,
+        'my_favorites' : my_favorites,
+        'other_quotes' : other_quotes,
         'users' : users,
-        'trips' : trips,
-        'other_trips' : other_trips,
+        'quotes' : quotes,
     }
-    return render(request, "belt_exam/travels.html", context)
+    return render(request, "belt_exam/quotes.html", context)
 
-def join(request, id):
+def add_favorite(request, id):
+    quote = Quote.objects.get(id=id)
     user = User.objects.get(id=request.session['logged_user'])
-    trip = Trip.objects.get(id=id)
-    Membership.objects.create(user=user, trip=trip)
-    return redirect('/travels')
+    Favorite.objects.create(user=user, quote=quote)
+    return redirect('/quotes')
 
-def add_plan(request):
-    return render(request, 'belt_exam/add.html')
-
-def add(request):
-    if request.method=="POST":
-        user = User.objects.get(id=request.session['logged_user'])
-        destination = request.POST['destination']
-        description = request.POST['description']
-        travel_start_date = request.POST['travel_start_date']
-        travel_end_date = request.POST['travel_end_date']
-        errors = Trip.objects.validate(travel_start_date, travel_end_date)
+def add_quote(request):
+    if request.method == "POST":
+        quote = request.POST['quote']
+        author = request.POST['author']
+        errors = Quote.objects.validate_quote(quote, author)
         if len(errors) >0:
             for error in errors:
                 messages.add_message(request, messages.INFO, error)
-            return redirect ('/add_plan')
+            return redirect ('/quotes')
         else:
-            trip = Trip.objects.create(planner=user, destination=destination, description=description, travel_start_date=travel_start_date, travel_end_date=travel_end_date)
-            Membership.objects.create(user=user, trip = trip)
-            return redirect('/travels')
+            poster = User.objects.get(id=request.session['logged_user'])
+            Quote.objects.create(quote=quote, author=author, poster=poster)
+            return redirect('/quotes')
     else:
-        return redirect('/travels')
+        return redirect('/')
 
-def destination(request, id):
-    trip = Trip.objects.get(id=id)
-    users = User.objects.filter(membership__trip=trip).exclude(id=trip.planner.id)
+def remove(request, id):
+    quote = Quote.objects.get(id=id)
+    user = User.objects.get(id=request.session['logged_user'])
+    Favorite.objects.get(quote=quote, user=user).delete()
+    return redirect('/quotes')
+
+def users(request, id):
+    user = User.objects.get(id=id)
+    quotes = Quote.objects.filter(poster=user)
     context = {
-        'trip' : trip,
-        'users' : users,
+        'user': user,
+        'quotes': quotes
     }
-    return render(request, 'belt_exam/destination.html', context)
-
-def delete(request, id):
-    User.objects.get(id=id).delete()
-    return redirect('/travels')
+    return render(request,"belt_exam/users.html", context)
 
 def logout(request):
     if "user" in request.session:
